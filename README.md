@@ -128,22 +128,6 @@ npm run db:studio
 
 ## 🌐 部署指南
 
-### Vercel 部署
-
-1. 将项目推送到 GitHub
-2. 在 Vercel 中导入项目
-3. 配置环境变量
-4. 部署并享受自动更新
-
-### Docker 部署
-
-```bash
-# 构建镜像
-docker build -t domain-query .
-
-# 运行容器
-docker run -p 3000:3000 domain-query
-```
 ### 静态网站部署（如Vercel、netlify、edgeone）
 
 1. fork项目到你GitHub仓库中
@@ -154,7 +138,17 @@ docker run -p 3000:3000 domain-query
    构建命令：npm run build
    发布目录：./next
 4. 配置环境变量
-4. 部署
+5. 部署
+
+### Docker 部署
+
+```bash
+# 构建镜像
+docker build -t domain-query .
+
+# 运行容器
+docker run -p 3000:3000 domain-query
+```
 
 ### 传统服务器部署
 
