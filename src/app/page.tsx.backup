@@ -839,37 +839,22 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="flex justify-between items-start mb-8">
-            <div className="flex-1">
-              <div className="flex justify-center mb-4">
-                <div className="relative w-16 h-16 md:w-20 md:h-20">
-                  <img
-                    src="/logo.png"
-                    alt="剑之魂域名查询 Logo"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="relative w-16 h-16 md:w-20 md:h-20">
+                <img
+                  src="/logo.svg"
+                  alt="Domain Query Logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 text-center">
-                剑之魂域名查询
-              </h1>
-              <p className="text-muted-foreground text-center">
-                免费的一站式域名信息查询
-              </p>
             </div>
-            
-            {/* Theme Toggle Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTheme}
-              className="ml-4"
-              title="切换主题"
-            >
-              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">切换主题</span>
-            </Button>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              域名信息查询工具
+            </h1>
+            <p className="text-muted-foreground">
+              支持RDAP和WHOIS两种查询方式，快速获取域名详细信息
+            </p>
           </div>
 
 
@@ -1075,8 +1060,8 @@ export default function Home() {
                     </>
                   )}
                 </div>
-                
-                <div className="flex gap-2">
+
+                  
                   {isAdmin ? (
                     <Button 
                       variant="outline" 
@@ -1357,20 +1342,6 @@ export default function Home() {
                       </svg>
                       开源仓库：github.com/xjl3421/domain-information
                     </a>
-                  </p>
-                  
-                  {/* 维护信息 */}
-                  <p className="text-sm text-muted-foreground text-center mt-2">
-                    本项目由
-                    <a 
-                      href="https://jhkj.netlify.app" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-green-600 dark:text-green-400 hover:underline mx-1"
-                    >
-                      "剑之魂科技"
-                    </a>
-                    维护
                   </p>
                 </div>
               </div>

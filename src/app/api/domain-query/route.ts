@@ -17,25 +17,37 @@ function getClientIP(request: NextRequest): string {
   return ip || realIP || forwarded?.split(',')[0] || 'unknown'
 }
 
-// 检查管理员密码
-function checkAdminPassword(request: NextRequest): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD
-  if (!adminPassword) return false
+// 检查认证密码和模式
+function checkAuthPassword(request: NextRequest): { isAuth: boolean; mode: 'admin' | 'personal' | null } {
+  const adminPassword = process.env.ADMIN_PASSWORD || '123456' // 默认密码
+  if (!adminPassword) return { isAuth: false, mode: null }
   
   const { searchParams } = new URL(request.url)
   const password = searchParams.get('password')
   
-  return password === adminPassword
+  if (password === adminPassword) {
+    // 简化处理：如果密码正确，认为是管理员模式
+    // 在实际应用中，这里应该检查环境变量来决定当前是管理员模式还是自用模式
+    const currentMode = process.env.ADMIN_MODE === 'false' ? 'personal' : 'admin'
+    return { isAuth: true, mode: currentMode }
+  }
+  
+  return { isAuth: false, mode: null }
 }
 
 // 检查请求频率限制
-function checkRateLimit(ip: string, isAdmin: boolean = false): { allowed: boolean; count: number; resetTime: number } {
+function checkRateLimit(ip: string, authResult: { isAuth: boolean; mode: 'admin' | 'personal' | null }): { allowed: boolean; count: number; resetTime: number } {
   const now = Date.now()
   const windowMs = 60 * 1000 // 1分钟
   const maxRequests = 12
 
-  // 管理员模式无限制
-  if (isAdmin) {
+  // 如果是自用模式，设置请求限制为0（无限制）
+  if (authResult.isAuth && authResult.mode === 'personal') {
+    return { allowed: true, count: 0, resetTime: now + windowMs }
+  }
+
+  // 管理员模式或其他认证用户也无限制
+  if (authResult.isAuth) {
     return { allowed: true, count: 0, resetTime: now + windowMs }
   }
 
@@ -63,7 +75,7 @@ function checkRateLimit(ip: string, isAdmin: boolean = false): { allowed: boolea
 }
 
 // RDAP查询函数
-async function queryRDAP(objectType: string, query: string): Promise<{ success: boolean; data?: any; error?: string; errorCode?: number }> {
+async function queryRDAP(objectType: string, query: string): Promise<{ success: boolean; data?: any; error?: string; errorCode?: number; isDomainNotSupported?: boolean }> {
   const baseUrl = 'https://rdap.org'
   const url = `${baseUrl}/${objectType}/${encodeURIComponent(query)}`
   
@@ -87,10 +99,16 @@ async function queryRDAP(objectType: string, query: string): Promise<{ success: 
       // 根据状态码返回不同的错误信息
       let errorMessage = ''
       let errorCode = response.status
+      let isDomainNotSupported = false
       
       switch (response.status) {
         case 404:
           errorMessage = '未找到指定的对象。请检查输入是否正确。'
+          // 如果是域名查询且404错误，可能是域名后缀不支持
+          if (objectType === 'domain') {
+            isDomainNotSupported = true
+            errorMessage = '该域名后缀不支持RDAP查询，建议使用WHOIS查询。'
+          }
           break
         case 429:
           errorMessage = '请求过于频繁，请稍后重试。'
@@ -114,7 +132,8 @@ async function queryRDAP(objectType: string, query: string): Promise<{ success: 
       return {
         success: false,
         error: errorMessage,
-        errorCode: errorCode
+        errorCode: errorCode,
+        isDomainNotSupported: isDomainNotSupported
       }
     }
 
@@ -224,8 +243,8 @@ export async function POST(request: NextRequest) {
 
     // 获取客户端IP并检查频率限制
     const clientIP = getClientIP(request)
-    const isAdmin = checkAdminPassword(request)
-    const rateLimitResult = checkRateLimit(clientIP, isAdmin)
+    const authResult = checkAuthPassword(request)
+    const rateLimitResult = checkRateLimit(clientIP, authResult)
 
     if (!rateLimitResult.allowed) {
       const resetTime = new Date(rateLimitResult.resetTime).toLocaleString('zh-CN')
@@ -244,7 +263,8 @@ export async function POST(request: NextRequest) {
             success: false,
             error: rdapResult.error,
             errorCode: rdapResult.errorCode,
-            type: 'rdap'
+            type: 'rdap',
+            isDomainNotSupported: rdapResult.isDomainNotSupported
           }, { status: 400 })
         }
         result = rdapResult.data
@@ -272,7 +292,8 @@ export async function POST(request: NextRequest) {
       type: type,
       requestCount: rateLimitResult.count,
       resetTime: rateLimitResult.resetTime,
-      isAdmin: isAdmin,
+      isAuth: authResult.isAuth,
+      authMode: authResult.mode,
       timestamp: new Date().toISOString()
     })
 

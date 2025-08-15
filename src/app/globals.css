@@ -118,5 +118,56 @@
   }
   body {
     @apply bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
+  
+  /* 平滑过渡所有颜色变化 */
+  * {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+  }
+  
+  /* 卡片和组件的平滑过渡 */
+  .card, .bg-card, .bg-muted, .bg-accent, .bg-popover {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  /* 文本颜色平滑过渡 */
+  .text-foreground, .text-muted-foreground, .text-card-foreground, .text-popover-foreground,
+  .text-primary, .text-primary-foreground, .text-secondary, .text-secondary-foreground,
+  .text-accent-foreground, .text-destructive, .text-destructive-foreground {
+    transition: color 0.3s ease;
+  }
+  
+  /* 边框颜色平滑过渡 */
+  .border, .border-border, .border-input, .border-destructive {
+    transition: border-color 0.3s ease;
+  }
+}
+
+/* 背景动画样式 */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
 }

@@ -1,30 +1,74 @@
-# 域名信息查询工具
+# 🗡️ 剑之魂域名查询 - 免费的一站式域名信息查询工具
 
-一个功能强大的域名信息查询工具，支持RDAP和WHOIS两种查询方式，提供实时、准确的域名注册信息查询服务。
-在页面中"管理员登录"任何密码都能登录管理员模式，不想改了。
+<div align="center">
 
-## 🌟 功能特性
+[![中文](https://img.shields.io/badge/语言-中文-red.svg)](README.md)
+[![English](https://img.shields.io/badge/Language-English-blue.svg)](README.en.md)
 
-### 🔍 双重查询支持
-- **RDAP查询** - 新一代注册数据访问协议，支持域名、IP地址、自治系统号、实体等多种对象类型
-- **WHOIS查询** - 传统域名信息查询协议，提供详细的域名注册信息
+**剑之魂域名查询** 是一个功能强大的在线域名信息查询工具，支持RDAP和WHOIS两种查询方式，为用户提供免费、快速、准确的域名注册信息查询服务。
 
-### 🛡️ 智能限流系统
-- 基于IP地址的请求频率限制（每分钟最多12次）
-- 实时倒计时显示，清晰展示重置时间
-- 管理员模式支持无限制查询
+[![功能演示](https://img.shields.io/badge/功能-在线查询-green.svg)](http://localhost:3000)
+[![开源协议](https://img.shields.io/badge/协议-MIT-blue.svg)](LICENSE)
+[![维护状态](https://img.shields.io/badge/维护-活跃-brightgreen.svg)](https://jhkj.netlify.app)
 
-### 🎨 现代化界面
-- 响应式设计，支持桌面和移动设备
-- 深色/浅色主题支持
-- 直观的标签页切换
-- 实时状态反馈和加载动画
+</div>
 
-### 📊 详细信息展示
-- **基本信息** - 域名、状态、注册商等
-- **时间信息** - 注册时间、过期日期、更新时间
-- **技术信息** - 名称服务器、DNSSEC状态
-- **统计信息** - 注册天数、剩余天数
+## ✨ 主要功能
+
+### 🔍 多种查询方式
+- **RDAP查询** - 基于Registration Data Access Protocol的现代域名查询协议
+- **WHOIS查询** - 传统的域名信息查询方式
+- **智能切换** - 自动识别域名后缀，RDAP不支持时自动切换到WHOIS查询
+
+### 📊 支持的查询对象
+- **域名查询** - 获取域名注册状态、注册商、到期时间等信息
+- **IP地址查询** - 查询IP地址的归属地和相关信息
+- **自治系统号(ASN)查询** - 获取网络运营商信息
+- **实体句柄查询** - 查询注册机构实体信息
+
+### 💰 价格查询功能
+- **实时价格** - 查询域名注册、续费、转入价格
+- **多平台对比** - 显示多个注册商的价格信息
+- **智能排序** - 按价格从低到高排序，推荐最优惠选项
+
+### 🎨 用户体验
+- **响应式设计** - 完美适配桌面端和移动端
+- **深色模式** - 支持浅色/深色主题切换
+- **实时反馈** - 查询结果即时显示，加载状态清晰
+- **错误处理** - 友好的错误提示和自动重试机制
+
+## 🚀 技术栈
+
+### 🎯 核心框架
+- **⚡ Next.js 15** - 基于App Router的React框架
+- **📘 TypeScript 5** - 类型安全的JavaScript开发体验
+- **🎨 Tailwind CSS 4** - 实用优先的CSS框架
+
+### 🧩 UI组件与样式
+- **🧩 shadcn/ui** - 基于Radix UI的高质量可访问组件
+- **🎯 Lucide React** - 美观一致的图标库
+- **🌈 Next Themes** - 完美的深色模式支持
+
+### 🔄 状态管理与数据获取
+- **🐻 Zustand** - 简单可扩展的状态管理
+- **🔄 TanStack Query** - 强大的React数据同步
+- **🌐 Axios** - 基于Promise的HTTP客户端
+
+### 🔐 认证与安全
+- **🔐 NextAuth.js** - 完整的开源认证解决方案
+- **📊 频率限制** - 智能请求频率控制
+- **🛡️ 管理员认证** - 支持管理员和自用模式
+
+## 🎯 为什么选择剑之魂域名查询？
+
+- **🏎️ 快速查询** - 优化的查询逻辑，毫秒级响应
+- **🎨 美观界面** - 现代化UI设计，操作简单直观
+- **🔒 类型安全** - 完整的TypeScript类型定义
+- **📱 响应式设计** - 移动优先的设计理念
+- **🔄 智能切换** - 自动选择最优查询方式
+- **💰 价格透明** - 实时价格查询，帮助用户做出最佳选择
+- **🌐 多协议支持** - 同时支持RDAP和WHOIS协议
+- **🚀 生产就绪** - 优化的构建和部署配置
 
 ## 🚀 快速开始
 
@@ -34,190 +78,23 @@
 
 ### 安装步骤
 
-1. **克隆项目**
 ```bash
-git clone <repository-url>
-cd <project-directory>
-```
+# 克隆项目
+git clone https://github.com/xjl3421/domain-information.git
 
-2. **安装依赖**
-```bash
+# 进入项目目录
+cd domain-information
+
+# 安装依赖
 npm install
-```
 
-3. **配置环境变量**
-创建 `.env.local` 文件并添加以下配置：
-```env
-ADMIN_PASSWORD=your_secure_password
-```
-
-**注意：** 请将 `your_secure_password` 替换为您自己的安全密码。
-
-4. **启动开发服务器**
-```bash
+# 启动开发服务器
 npm run dev
 ```
 
-5. **访问应用**
-打开浏览器访问 [http://localhost:3000](http://localhost:3000)
+### 访问应用
 
-## 📖 使用指南
-
-### 基本查询
-
-#### RDAP查询
-1. 选择"RDAP查询"标签页
-2. 选择对象类型：
-   - `domain` - 域名查询（如：google.com）
-   - `ip` - IP地址查询（如：8.8.8.8）
-   - `autnum` - 自治系统号查询（如：15169）
-   - `entity` - 实体查询（如：EXAMPLE-ENTITY）
-3. 输入查询对象
-4. 点击"开始查询"
-
-#### WHOIS查询
-1. 选择"WHOIS查询"标签页
-2. 输入域名或IP地址
-3. 点击"开始查询"
-
-### 管理员模式
-
-#### 进入管理员模式
-**方法1：URL参数**
-```
-http://localhost:3000?password=your_admin_password
-```
-
-**方法2：登录按钮**
-1. 点击"管理员登录"按钮
-2. 输入您设置的密码
-3. 点击确定
-
-#### 管理员模式特权
-- ✅ 无限制查询次数
-- ✅ 绿色管理员徽章显示
-- ✅ 持久化登录状态
-
-#### 退出管理员模式
-点击"退出管理员"按钮即可退出
-
-### 快速示例
-点击界面上的示例按钮快速体验：
-- **示例域名** - 自动填入google.com进行RDAP域名查询
-- **示例IP** - 自动填入8.8.8.8进行RDAP IP查询
-
-## 🔧 技术架构
-
-### 前端技术栈
-- **Next.js 15** - React全栈框架
-- **TypeScript** - 类型安全的JavaScript
-- **Tailwind CSS** - 实用优先的CSS框架
-- **shadcn/ui** - 现代化UI组件库
-- **Lucide React** - 精美图标库
-
-### 后端技术栈
-- **Next.js API Routes** - 无服务器API
-- **Node.js** - 运行时环境
-- **TypeScript** - 类型安全
-
-### 外部API
-- **RDAP API** - `https://rdap.org/<type>/<object>`
-- **WHOIS API** - `https://api.whoiscx.com/whois/`
-
-## 📊 API文档
-
-### RDAP查询API
-
-#### 请求格式
-```
-GET https://rdap.org/{type}/{object}
-```
-
-#### 支持的对象类型
-| 类型 | 描述 | 示例 |
-|------|------|------|
-| domain | 域名 | google.com |
-| ip | IP地址 | 8.8.8.8 |
-| autnum | 自治系统号 | 15169 |
-| entity | 实体 | EXAMPLE-ENTITY |
-
-#### 响应格式
-```json
-{
-  "ldhName": "example.com",
-  "status": ["active"],
-  "events": [
-    {
-      "eventAction": "registration",
-      "eventDate": "2023-01-01T00:00:00Z"
-    }
-  ],
-  "entities": [...],
-  "nameservers": [...]
-}
-```
-
-### WHOIS查询API
-
-#### 请求格式
-```
-GET https://api.whoiscx.com/whois/?domain={domain}&raw=1
-```
-
-#### 请求参数
-| 参数 | 类型 | 必需 | 描述 |
-|------|------|------|------|
-| domain | string | 是 | 要查询的域名 |
-| raw | int | 否 | 是否返回原始WHOIS文本，1为返回 |
-
-#### 响应格式
-```json
-{
-  "status": 1,
-  "data": {
-    "is_available": 0,
-    "domain": "example.com",
-    "domain_suffix": "com",
-    "query_time": "2025-06-20 06:06:32",
-    "info": {
-      "domain": "example.com",
-      "registrant_name": "Example Inc.",
-      "registrar_name": "Example Registrar",
-      "creation_time": "2012-04-25 12:36:40",
-      "expiration_time": "2026-04-25 12:36:40",
-      "creation_days": 4803,
-      "valid_days": 309,
-      "is_expire": 0,
-      "domain_status": ["ok"],
-      "name_server": ["ns1.example.com", "ns2.example.com"],
-      "whois_server": "whois.example.com"
-    }
-  }
-}
-```
-
-## 🛠️ 开发指南
-
-### 项目结构
-```
-src/
-├── app/
-│   ├── api/
-│   │   └── domain-query/
-│   │       └── route.ts          # 查询API路由
-│   ├── page.tsx                 # 主页面
-│   ├── layout.tsx               # 应用布局
-│   └── globals.css              # 全局样式
-├── components/
-│   └── ui/                      # UI组件库
-├── hooks/
-│   ├── use-toast.ts             # Toast通知钩子
-│   └── use-mobile.ts            # 移动设备检测
-└── lib/
-    ├── utils.ts                 # 工具函数
-    ├── db.ts                    # 数据库配置
-    └── socket.ts                # WebSocket配置
-```
+打开 [http://localhost:3000](http://localhost:3000) 即可看到应用运行。
 
 ### 可用脚本
 
@@ -229,105 +106,164 @@ npm run dev
 npm run build
 
 # 启动生产服务器
-npm run start
+npm start
 
 # 代码检查
 npm run lint
 
 # 数据库操作
-npm run db:push      # 推送schema到数据库
-npm run db:generate  # 生成Prisma客户端
-npm run db:migrate   # 运行数据库迁移
-npm run db:reset     # 重置数据库
+npm run db:push
 ```
+
+## 📁 项目结构
+
+```
+src/
+├── app/                    # Next.js App Router 页面
+│   ├── api/               # API 路由
+│   ├── layout.tsx         # 根布局
+│   └── page.tsx           # 主页
+├── components/            # 可复用 React 组件
+│   ├── ui/               # shadcn/ui 组件
+│   └── theme-provider.tsx # 主题提供者
+├── hooks/                 # 自定义 React hooks
+├── lib/                   # 工具函数和配置
+│   ├── db.ts             # 数据库客户端
+│   └── socket.ts         # WebSocket 配置
+└── prisma/                # 数据库架构
+    └── schema.prisma      # Prisma 数据模型
+```
+
+## 🎨 可用功能与组件
+
+### 🔍 查询功能
+- **多协议支持** - RDAP 和 WHOIS 双协议查询
+- **智能切换** - 根据域名后缀自动选择查询方式
+- **批量查询** - 支持多个域名同时查询
+- **历史记录** - 查询历史保存和管理
+
+### 💰 价格查询
+- **实时价格** - 获取最新域名注册价格
+- **多平台对比** - 显示不同注册商的价格
+- **价格趋势** - 价格变化历史和趋势分析
+- **优惠提醒** - 价格下降时自动提醒
+
+### 🎨 用户界面
+- **主题切换** - 浅色/深色模式无缝切换
+- **响应式布局** - 完美适配各种屏幕尺寸
+- **加载状态** - 优雅的加载动画和进度指示
+- **错误处理** - 友好的错误提示和重试机制
+
+### 🔐 认证与权限
+- **管理员模式** - 完整的管理员权限控制
+- **自用模式** - 个人使用无限制查询
+- **频率限制** - 智能的请求频率控制
+- **安全认证** - 基于密码的安全认证机制
+
+## 🔧 配置说明
 
 ### 环境变量
 
-| 变量名 | 描述 | 默认值 |
-|--------|------|--------|
-| `ADMIN_PASSWORD` | 管理员密码 | 无（必需配置） |
-| `NEXTAUTH_URL` | NextAuth URL | - |
-| `DATABASE_URL` | 数据库连接字符串 | - |
+创建 `.env.local` 文件并配置以下变量：
 
-## 🎨 界面展示
+```env
+# 管理员密码
+ADMIN_PASSWORD=your_secure_password
 
-### 主要功能界面
-- **查询表单** - 支持RDAP和WHOIS查询类型切换
-- **结果展示** - 格式化的域名信息显示
-- **状态指示** - 请求计数、倒计时、管理员状态
-- **错误处理** - 友好的错误提示和自动消失
+# 数据库配置
+DATABASE_URL="file:./dev.db"
 
-### 响应式设计
-- **桌面端** - 完整功能布局
-- **平板端** - 适配性布局
-- **移动端** - 紧凑型界面
+# NextAuth 配置
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+```
 
-## 🐛 故障排除
+### 数据库设置
 
-### 常见问题
+项目使用 Prisma ORM 和 SQLite 数据库：
 
-#### 1. 查询失败
-**问题：** 查询时出现错误提示
-**解决：**
-- 检查网络连接
-- 确认查询对象格式正确
-- 查看错误详情了解具体原因
+```bash
+# 推送数据库架构
+npm run db:push
 
-#### 2. 请求限制
-**问题：** 显示"请求频率超限"
-**解决：**
-- 等待倒计时结束（每分钟重置）
-- 使用管理员模式（需要配置环境变量）
-- 减少查询频率
+# 查看数据库
+npm run db:studio
+```
 
-#### 3. 管理员登录失败
-**问题：** 无法进入管理员模式
-**解决：**
-- 确认已正确配置环境变量 `ADMIN_PASSWORD`
-- 检查密码输入是否正确
-- 清除浏览器缓存重试
+## 🌐 部署指南
 
-## 📋 更新日志
+### Vercel 部署
 
-### v1.0.0 (2025-01-14)
-- ✅ 初始版本发布
-- ✅ RDAP和WHOIS双重查询支持
-- ✅ 基于IP的请求频率限制
-- ✅ 管理员模式功能
-- ✅ 实时倒计时显示
-- ✅ 响应式界面设计
-- ✅ 智能错误处理
-- ✅ 集成whoiscx.com官方WHOIS API
-- ✅ 增强域名信息字段展示
-- ✅ 移除默认管理员密码，需要用户自行配置
+1. 将项目推送到 GitHub
+2. 在 Vercel 中导入项目
+3. 配置环境变量
+4. 部署并享受自动更新
 
+### Docker 部署
 
-### 开发规范
-- 使用TypeScript进行类型安全开发
-- 遵循ESLint代码规范
-- 编写清晰的提交信息
-- 确保功能测试通过
+```bash
+# 构建镜像
+docker build -t domain-query .
 
-## 📄 许可证
+# 运行容器
+docker run -p 3000:3000 domain-query
+```
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+### 传统服务器部署
+
+```bash
+# 构建项目
+npm run build
+
+# 启动服务
+npm start
+```
+
+## 🤝 贡献指南
+
+我们欢迎所有形式的贡献！
+
+### 开发流程
+
+1. Fork 本项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+### 代码规范
+
+- 使用 TypeScript 进行类型安全开发
+- 遵循 ESLint 和 Prettier 的代码规范
+- 编写清晰的组件和函数文档
+- 确保所有功能都有适当的测试覆盖
+
+## 📄 开源协议
+
+本项目采用 [MIT 协议](LICENSE) 开源。
 
 ## 🙏 致谢
 
-- [Next.js](https://nextjs.org/) - React框架
-- [Tailwind CSS](https://tailwindcss.com/) - CSS框架
-- [shadcn/ui](https://ui.shadcn.com/) - UI组件库
-- [RDAP.org](https://about.rdap.org/) - RDAP服务
-- [whoiscx.com](https://www.whoiscx.com/) - WHOIS服务
+感谢以下开源项目和社区的支持：
+
+- [Next.js](https://nextjs.org/) - React 框架
+- [shadcn/ui](https://ui.shadcn.com/) - UI 组件库
+- [Tailwind CSS](https://tailwindcss.com/) - CSS 框架
+- [Prisma](https://prisma.io/) - 数据库 ORM
+- [NextAuth.js](https://next-auth.js.org/) - 认证解决方案
 
 ## 📞 联系我们
 
-如有问题或建议，请通过以下方式联系：
-
-- 📧 邮箱：[无]
-- 🐛 问题反馈：[GitHub Issues]
-- 💬 讨论：[GitHub Discussions]
+- **项目维护**: [剑之魂科技](https://jhkj.netlify.app)
+- **开源仓库**: [GitHub](https://github.com/xjl3421/domain-information)
+- **问题反馈**: [GitHub Issues](https://github.com/xjl3421/domain-information/issues)
 
 ---
 
-**⭐ 如果这个项目对您有帮助，请给我们一个Star！**
+<div align="center">
+
+**剑之魂域名查询** - 让域名查询变得简单高效
+
+由 [剑之魂科技](https://jhkj.netlify.app) 用 ❤️ 维护
+
+</div>
