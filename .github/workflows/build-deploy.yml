@@ -1,144 +1,57 @@
-name: Build and Save to Pages
+name: Build and Deploy Next.js App
 
+# 触发条件：当有推送到main分支时执行
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
+    branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build project
-      run: npm run build
-      env:
-        NODE_ENV: production
-        
-    - name: Create pages directory
-      run: mkdir -p ./pages
-      
-    - name: Copy build output to pages directory
-      run: |
-        # Copy the entire .next directory to pages
-        cp -r ./.next ./pages/
-        # Copy public assets
-        cp -r ./public ./pages/
-        # Copy package.json and package-lock.json for deployment
-        cp package.json ./pages/
-        cp package-lock.json ./pages/
-        
-    - name: Create pages deployment info
-      run: |
-        cat > ./pages/DEPLOYMENT_INFO.md << EOF
-        # 部署信息
-        
-        ## 构建时间
-        $(date -u)
-        
-        ## 构建环境
-        - Node.js: ${{ matrix.node-version }}
-        - OS: ubuntu-latest
-        - 分支: ${{ github.ref_name }}
-        - 提交: ${{ github.sha }}
-        
-        ## 构建命令
-        \`\`\`bash
-        npm ci
-        npm run build
-        \`\`\`
-        
-        ## 文件结构
-        此目录包含完整的Next.js构建输出，可以直接用于部署。
-        
-        ## 使用说明
-        1. 进入此目录: \`cd pages\`
-        2. 安装依赖: \`npm install --production\`
-        3. 启动服务: \`npm start\`
-        
-        ---
-        自动生成于 $(date -u)
-        EOF
-        
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-output-${{ matrix.node-version }}
-        path: ./pages/
-        retention-days: 30
-        
-    - name: Commit pages changes
-      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add ./pages/
-        if ! git diff --staged --quiet; then
-          git commit -m "🤖 自动更新构建输出 - $(date -u)
-          
-          构建信息:
-          - Node.js版本: ${{ matrix.node-version }}
-          - 提交: ${{ github.sha }}
-          - 分支: ${{ github.ref_name }}
-          
-          此提交由GitHub Actions自动生成"
-          git push
-        else
-          echo "没有检测到构建输出变化，跳过提交"
-        fi
-        
-    - name: Create build summary
-      run: |
-        echo "## 🚀 构建完成" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📊 构建信息" >> $GITHUB_STEP_SUMMARY
-        echo "- **Node.js版本**: \`${{ matrix.node-version }}\`" >> $GITHUB_STEP_SUMMARY
-        echo "- **构建时间**: $(date -u)" >> $GITHUB_STEP_SUMMARY
-        echo "- **分支**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-        echo "- **提交**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📁 输出位置" >> $GITHUB_STEP_SUMMARY
-        echo "- **构建输出**: \`./pages/\` 目录" >> $GITHUB_STEP_SUMMARY
-        echo "- **构建产物**: 已上传为artifact" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### ✅ 后续步骤" >> $GITHUB_STEP_SUMMARY
-        echo "1. 构建输出已保存到 \`./pages/\` 目录" >> $GITHUB_STEP_SUMMARY
-        echo "2. 可以直接从该目录部署应用" >> $GITHUB_STEP_SUMMARY
-        echo "3. 构建产物可在Actions页面下载" >> $GITHUB_STEP_SUMMARY
+      # 步骤1：检出代码仓库
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取所有历史记录，确保分支操作正常
 
-  deploy-notification:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    
-    steps:
-    - name: Send deployment notification
-      run: |
-        echo "## 🎉 部署通知" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📦 构建输出已更新" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "构建输出已成功保存到 \`./pages/\` 目录，可以用于部署。" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🔗 快速链接" >> $GITHUB_STEP_SUMMARY
-        echo "- **仓库主页**: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }})" >> $GITHUB_STEP_SUMMARY
-        echo "- **提交记录**: [查看提交](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
-        echo "- **Actions日志**: [查看日志](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+      # 步骤2：设置Node.js环境
+      - name: Set up Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'  # 缓存npm依赖，加速构建
+
+      # 步骤3：安装项目依赖
+      - name: Install dependencies
+        run: npm install
+
+      # 步骤4：构建Next.js项目
+      - name: Build Next.js app
+        run: npm run build
+
+      # 步骤5：检出pages分支（如果不存在则创建）
+      - name: Checkout pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: 'pages'
+          path: 'pages-branch'  # 检出到pages-branch目录
+
+      # 步骤6：将构建结果复制到pages分支的./pages文件夹
+      - name: Copy build output to pages branch
+        run: |
+          # 创建目标目录（如果不存在）
+          mkdir -p pages-branch/pages
+          # 复制.next目录内容到目标位置
+          cp -r .next/** pages-branch/pages/
+
+      # 步骤7：提交并推送更改到pages分支
+      - name: Commit and push changes
+        working-directory: ./pages-branch
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add .
+          git commit -m "Automatically deployed from main branch: $GITHUB_SHA" || echo "No changes to commit"
+          git push origin pages
