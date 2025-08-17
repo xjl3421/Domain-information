@@ -1,4 +1,4 @@
-name: Build and Deploy to Pages Branch
+name: Build and Save to Pages
 
 on:
   push:
@@ -18,9 +18,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # 获取所有历史记录以便检查pages分支
-        
+      
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
@@ -35,21 +33,22 @@ jobs:
       env:
         NODE_ENV: production
         
-    - name: Create temporary build directory
+    - name: Create pages directory
+      run: mkdir -p ./pages
+      
+    - name: Copy build output to pages directory
       run: |
-        # 创建临时构建目录
-        mkdir -p ./temp-build
+        # Copy the entire .next directory to pages
+        cp -r ./.next ./pages/
+        # Copy public assets
+        cp -r ./public ./pages/
+        # Copy package.json and package-lock.json for deployment
+        cp package.json ./pages/
+        cp package-lock.json ./pages/
         
-        # 复制构建输出
-        cp -r ./.next ./temp-build/
-        cp -r ./public ./temp-build/
-        
-        # 复制必要的配置文件
-        cp package.json ./temp-build/
-        cp package-lock.json ./temp-build/
-        
-        # 创建部署信息文件
-        cat > ./temp-build/DEPLOYMENT_INFO.md << EOF
+    - name: Create pages deployment info
+      run: |
+        cat > ./pages/DEPLOYMENT_INFO.md << EOF
         # 部署信息
         
         ## 构建时间
@@ -71,98 +70,40 @@ jobs:
         此目录包含完整的Next.js构建输出，可以直接用于部署。
         
         ## 使用说明
-        1. 进入此目录: \`cd .\`
+        1. 进入此目录: \`cd pages\`
         2. 安装依赖: \`npm install --production\`
         3. 启动服务: \`npm start\`
-        
-        ## 分支信息
-        - 源分支: ${{ github.ref_name }}
-        - 源提交: ${{ github.sha }}
-        - 构建分支: pages
         
         ---
         自动生成于 $(date -u)
         EOF
         
-    - name: Setup Git for pages branch
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        
-    - name: Check if pages branch exists
-      id: check-pages
-      run: |
-        if git show-ref --verify --quiet refs/heads/pages; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-          echo "Pages branch exists"
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Pages branch does not exist"
-        fi
-        
-    - name: Create pages branch if not exists
-      if: steps.check-pages.outputs.exists == 'false'
-      run: |
-        echo "Creating orphan pages branch..."
-        git checkout --orphan pages
-        git rm -rf .
-        echo "# Pages Branch" > README.md
-        echo "This branch contains the build output of the main application." >> README.md
-        git add README.md
-        git commit -m "🌱 Initial pages branch"
-        git push origin pages
-        git checkout ${{ github.ref_name }}
-        
-    - name: Switch to pages branch and update
-      run: |
-        # 切换到pages分支
-        git checkout pages
-        
-        # 清理现有内容（保留.git目录和README.md）
-        find . -maxdepth 1 ! -name '.git' ! -name 'README.md' ! -name '.' -exec rm -rf {} +
-        
-        # 复制构建输出
-        cp -r ./temp-build/* ./
-        cp -r ./temp-build/.* ./ 2>/dev/null || true
-        
-        # 清理临时目录
-        rm -rf ./temp-build
-        
-    - name: Commit and push to pages branch
-      run: |
-        git add .
-        if ! git diff --staged --quiet; then
-          git commit -m "🚀 自动更新构建输出 - $(date -u)
-          
-          构建信息:
-          - Node.js版本: ${{ matrix.node-version }}
-          - 源分支: ${{ github.ref_name }}
-          - 源提交: ${{ github.sha }}
-          - 构建时间: $(date -u)
-          
-          文件变更:
-          - 更新Next.js构建输出
-          - 更新静态资源
-          - 更新部署信息
-          
-          此提交由GitHub Actions自动生成"
-          
-          git push origin pages
-          echo "✅ 成功推送到pages分支"
-        else
-          echo "ℹ️ 没有检测到构建输出变化，跳过提交"
-        fi
-        
-    - name: Switch back to source branch
-      run: |
-        git checkout ${{ github.ref_name }}
-        
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build-output-${{ matrix.node-version }}
-        path: ./.next/
+        path: ./pages/
         retention-days: 30
+        
+    - name: Commit pages changes
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add ./pages/
+        if ! git diff --staged --quiet; then
+          git commit -m "🤖 自动更新构建输出 - $(date -u)
+          
+          构建信息:
+          - Node.js版本: ${{ matrix.node-version }}
+          - 提交: ${{ github.sha }}
+          - 分支: ${{ github.ref_name }}
+          
+          此提交由GitHub Actions自动生成"
+          git push
+        else
+          echo "没有检测到构建输出变化，跳过提交"
+        fi
         
     - name: Create build summary
       run: |
@@ -171,17 +112,16 @@ jobs:
         echo "### 📊 构建信息" >> $GITHUB_STEP_SUMMARY
         echo "- **Node.js版本**: \`${{ matrix.node-version }}\`" >> $GITHUB_STEP_SUMMARY
         echo "- **构建时间**: $(date -u)" >> $GITHUB_STEP_SUMMARY
-        echo "- **源分支**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-        echo "- **源提交**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-        echo "- **目标分支**: \`pages\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **分支**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **提交**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📁 输出位置" >> $GITHUB_STEP_SUMMARY
-        echo "- **构建输出**: \`pages\` 分支" >> $GITHUB_STEP_SUMMARY
+        echo "- **构建输出**: \`./pages/\` 目录" >> $GITHUB_STEP_SUMMARY
         echo "- **构建产物**: 已上传为artifact" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### ✅ 后续步骤" >> $GITHUB_STEP_SUMMARY
-        echo "1. 构建输出已推送到 \`pages\` 分支" >> $GITHUB_STEP_SUMMARY
-        echo "2. 可以从pages分支部署应用" >> $GITHUB_STEP_SUMMARY
+        echo "1. 构建输出已保存到 \`./pages/\` 目录" >> $GITHUB_STEP_SUMMARY
+        echo "2. 可以直接从该目录部署应用" >> $GITHUB_STEP_SUMMARY
         echo "3. 构建产物可在Actions页面下载" >> $GITHUB_STEP_SUMMARY
 
   deploy-notification:
@@ -196,10 +136,9 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📦 构建输出已更新" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "构建输出已成功推送到 \`pages\` 分支，可以用于部署。" >> $GITHUB_STEP_SUMMARY
+        echo "构建输出已成功保存到 \`./pages/\` 目录，可以用于部署。" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🔗 快速链接" >> $GITHUB_STEP_SUMMARY
         echo "- **仓库主页**: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }})" >> $GITHUB_STEP_SUMMARY
-        echo "- **源提交**: [查看提交](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
-        echo "- **Pages分支**: [查看pages分支](${{ github.server_url }}/${{ github.repository }}/tree/pages)" >> $GITHUB_STEP_SUMMARY
+        echo "- **提交记录**: [查看提交](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
         echo "- **Actions日志**: [查看日志](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
